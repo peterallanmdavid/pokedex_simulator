@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Pokedex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen" charset="utf-8">
+  </head>
+  <body>
+    <div id="app" class="container">
+
+    </div>
+    <!-- React -->
+    <script src="js/vendor/react-15.2.1.js"></script>
+    <script src="js/vendor/react-dom-15.2.1.js"></script>
+    <script src="js/vendor/react-router.min.js"></script>
+    <script src="js/vendor/babel-core-5.8.34.min.js"></script>
+    <!-- React -->
+    <script src="js/vendor/jquery.1.12.4.min.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      function saveAPIResult(name, obj) {
+        window.localStorage.setItem(name, JSON.stringify(obj));
+      }
+      function getAPIResult(name) {
+        var api = window.localStorage.getItem(name);
+        console.log(JSON.parse(api));
+        return JSON.parse(api);
+      }
+      function checkPage(pages, url) {
+        var page = '';
+        for(var i = 0; i < 18; i++) {
+          for(var prop in pages) {
+            if(pages.hasOwnProperty(prop)) {
+              if(pages[i].url == url) {
+                page = pages[i].name;
+              }
+            }
+          }
+        }
+        return page;
+      }
+
+      function checkPageLocalStorate(pages, url) {
+        var page = checkPage(pages, url);
+        if(page in localStorage) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    </script>
+    <script type="text/babel">
+      var Route = ReactRouter.Route;
+      var Router = ReactRouter.Router;
+      var Link = ReactRouter.Link;
+      var hashHistory = ReactRouter.hashHistory;
+      var History = ReactRouter.useRouterHistory;
+      var appHistory = History({ queryKey: false });
+
+      var POKEMON_API_URL = 'http://pokeapi.co/api/v2/pokemon/';
+      var LIMIT = 'limit=50'
+      var POKEMON_PAGES = [
+        {
+          url: POKEMON_API_URL + '?' + LIMIT,
+          name: 'one'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=50',
+          name: 'two'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=100',
+          name: 'three'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=150',
+          name: 'four'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=200',
+          name: 'five'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=250',
+          name: 'six'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=300',
+          name: 'seven'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=350',
+          name: 'eigth'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=400',
+          name: 'nine'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=450',
+          name: 'ten'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=500',
+          name: 'eleven'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=550',
+          name: 'twelve'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=600',
+          name: 'thirteen'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=650',
+          name: 'fourteen'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=700',
+          name: 'fifteen'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=750',
+          name: 'sixteen'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=800',
+          name: 'seventeen'
+        }, {
+          url: POKEMON_API_URL + '?' + LIMIT + '&offset=850',
+          name: 'eighteen'
+        },
+      ];
+
+      /**************** Pokemon Lists ***************/
+
+      var PokemonLists = React.createClass({
+        handleNext: function(e) {
+          e.preventDefault();
+          console.log(e.target.href);
+          this.loadData(e.target.href);
+        },
+
+        handlePrev: function(e) {
+          e.preventDefault();
+          console.log(e.target.href);
+          this.loadData(e.target.href);
+        },
+
+        loadData: function(url) {
+          var _this = this;
+          var url = url || POKEMON_API_URL + '?' + LIMIT;
+          var page = checkPage(POKEMON_PAGES, url);
+          var localStoragePage = checkPageLocalStorate(POKEMON_PAGES, url);
+          if(page && localStoragePage) {
+            console.log('Data from localStorage');
+            var res = getAPIResult(page);
+
+            _this.setState({
+              list: res.results,
+              total: res.count,
+              prev: res.previous,
+              next: res.next
+            });
+          } else {
+            console.log('Data from API');
+
+            fetch(url)
+              .then(function(res) {
+                return res.json();
+              })
+              .then(function(res) {
+                console.log(res);
+                saveAPIResult(page, res);
+                _this.setState({
+                  list: res.results,
+                  total: res.count,
+                  prev: res.previous,
+                  next: res.next
+                });
+              }).catch(function(res) {
+                console.log(res);
+              });
+          }
+        },
+
+        onShowDetails: function(pokemon) {
+          var _this = this;
+          var url = POKEMON_API_URL + pokemon;
+          console.log('Showing Details of ' + pokemon);
+
+          if(url in localStorage) {
+            console.log('Data from localStorage');
+            var res = getAPIResult(url);
+
+            _this.setState({
+              abilities: res.abilities,
+              base_experience: res.base_experience,
+              forms: res.forms,
+              game_indices: res.game_indices,
+              height: res.height,
+              held_items: res.held_items,
+              id: res.id,
+              is_default: res.is_default,
+              location_area_encounters: res.location_area_encounters,
+              moves: res.moves,
+              name: res.name,
+              order: res.order,
+              species: res.species,
+              sprites: res.sprites,
+              stats: res.stats,
+              types: res.types,
+              weight: res.weight,
+            });
+          } else {
+            console.log('Data from API');
+            fetch(url)
+              .then(function(res) {
+                return res.json();
+              })
+              .then(function(res) {
+                console.log(res);
+                saveAPIResult(url, res);
+                _this.setState({
+                  abilities: res.abilities,
+                  base_experience: res.base_experience,
+                  forms: res.forms,
+                  game_indices: res.game_indices,
+                  height: res.height,
+                  held_items: res.held_items,
+                  id: res.id,
+                  is_default: res.is_default,
+                  location_area_encounters: res.location_area_encounters,
+                  moves: res.moves,
+                  name: res.name,
+                  order: res.order,
+                  species: res.species,
+                  sprites: res.sprites,
+                  stats: res.stats,
+                  types: res.types,
+                  weight: res.weight,
+                });
+              }).catch(function(res) {
+                console.log(res);
+              });
+            }
+        },
+
+        componentWillMount: function() {
+        },
+
+        componentDidMount: function() {
+          var _this = this;
+          this.loadData();
+        },
+
+        componentWillUnmount: function() {
+          //this.serverRequest.abort();
+        },
+
+        getInitialState: function() {
+          return {
+            list: [],
+            total: 0,
+            prev: '',
+            next: '',
+            abilities: [],
+            base_experience: '',
+            forms: [],
+            game_indices: [],
+            height: '',
+            held_items: [],
+            id: '',
+            is_default: true,
+            location_area_encounters: '',
+            moves: [],
+            name: '',
+            order: 5,
+            species: {},
+            sprites: {},
+            stats: [],
+            types: [],
+            weight: '',
+          };
+        },
+
+        render: function() {
+          var pokemons = this.state.list.map(function(pokemon) {
+            return <PokemonItem key={pokemon.name} onShowDetails={this.onShowDetails} data={pokemon} />;
+          }.bind(this));
+
+          return (
+            <div id="wrap" className="row">
+              <div className="col-md-3">
+                <div className="page-header">
+                  <h1>Pokedex <small>({ this.state.total })</small></h1>
+                </div>
+                <h3>Pokemons</h3>
+                <div className="list-group">
+                  { pokemons }
+                </div>
+                <div className="btn-group" role="group">
+                  <a href={this.state.prev || '#'} className="btn btn-default" role="button" disabled={!this.state.prev} onClick={this.handlePrev}>Prev</a>
+                  <a href={this.state.next || '#'} className="btn btn-default" role="button" disabled={!this.state.next} onClick={this.handleNext}>Next</a>
+                </div>
+                <p>
+                  <a href="#">About</a>
+                </p>
+              </div>
+
+              <div className="col-md-9">
+                <div className="page-header">
+                  <h1>Details of {this.state.name}</h1>
+                </div>
+                <PokemonDetails key={this.state.name} data={this.state} />
+              </div>
+            </div>
+          );
+        }
+      });
+
+      /**************** Pokemon Item ***************/
+
+      var PokemonItem = React.createClass({
+
+        showDetails: function(e) {
+          e.preventDefault();
+          this.props.onShowDetails(this.props.data.name);
+          this.setState({ selected : true });
+        },
+
+        uppercase: function(str) {
+          return str.charAt(0).toUpperCase() + str.slice(1);
+        },
+
+        getInitialState: function() {
+          return {
+            selected: false
+          }
+        },
+
+        getDefaultProps: function() {
+          return {
+            name: 'macmac',
+            link: 'http://www.markanthonyuy.com',
+          };
+        },
+
+        render: function() {
+          return (
+            <a href="#" className={this.state.selected ? 'list-group-item active' : 'list-group-item'} onClick={this.showDetails}>{this.uppercase(this.props.data.name)}</a>
+          )
+        }
+
+      });
+
+      /**************** Pokemon Details Table Row ***************/
+
+      var PokemonDetailsTableRow = React.createClass({
+        render: function() {
+          return (
+            <tr>
+              <th scope="row">{ this.props.name }</th>
+              <td>{ this.props.value }</td>
+              {(() => {
+
+                if(this.props.extra) {
+
+                  return (
+                    <td>{ this.props.extra }</td>
+                  )
+                }
+              })()}
+            </tr>
+          )
+        }
+      });
+
+      /**************** Pokemon Details Image View ***************/
+
+      var PokemonDetailsImageView = React.createClass({
+        render: function() {
+          return (
+            <div className="col-sm-6 col-md-3">
+              <div className="thumbnail">
+                <img src={ this.props.value } alt={ this.props.name } />
+                <div className="caption">
+                  <h5>{ this.props.name } <span className="label label-primary">{ this.props.gender }</span></h5>
+                </div>
+              </div>
+            </div>
+          )
+        }
+      });
+
+      var PokemonDetails = React.createClass({
+
+        getDefaultProps: function() {
+          return {
+            abilities: [],
+            base_experience: '',
+            forms: [],
+            game_indices: [],
+            height: '',
+            held_items: [],
+            id: '',
+            is_default: true,
+            location_area_encounters: '',
+            moves: [],
+            name: '',
+            order: '',
+            species: {},
+            sprites: {},
+            stats: [],
+            types: [],
+            weight: '',
+          };
+        },
+
+        render: function() {
+          return (
+            <div>
+              <div className="row">
+                <PokemonDetailsImageView name="Front View" value={ this.props.data.sprites.front_default } gender="M"/>
+                <PokemonDetailsImageView name="Shiny Front" value={ this.props.data.sprites.front_shiny } gender="M"/>
+                <PokemonDetailsImageView name="Back View" value={ this.props.data.sprites.back_default } gender="M"/>
+                <PokemonDetailsImageView name="Shiny Back" value={ this.props.data.sprites.back_shiny } gender="M"/>
+              </div>
+
+              {(() => {
+
+                if(this.props.data.sprites.back_female || this.props.data.sprites.back_shiny_female ||
+                  this.props.data.sprites.front_female || this.props.data.sprites.front_shiny_female) {
+
+                  return (
+                    <div className="row">
+                      <PokemonDetailsImageView name="Front View" value={ this.props.data.sprites.front_female } gender="F"/>
+                      <PokemonDetailsImageView name="Shiny Front" value={ this.props.data.sprites.front_shiny_female } gender="F"/>
+                      <PokemonDetailsImageView name="Back View" value={ this.props.data.sprites.back_female } gender="F"/>
+                      <PokemonDetailsImageView name="Shiny Back" value={ this.props.data.sprites.back_shiny_female } gender="F"/>
+                    </div>
+                  )
+                }
+              })()}
+
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <caption>Basic Information</caption>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <PokemonDetailsTableRow name="ID" value={this.props.data.id} />
+                    <PokemonDetailsTableRow name="Name" value={this.props.data.name} />
+                    <PokemonDetailsTableRow name="Weight" value={this.props.data.weight} />
+                    <PokemonDetailsTableRow name="Height" value={this.props.data.height} />
+                    <PokemonDetailsTableRow name="Order" value={this.props.data.order} />
+                    <PokemonDetailsTableRow name="Base Experience" value={this.props.data.base_experience} />
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <caption>Types</caption>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Slot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    { this.props.data.types.map(function(type) {
+                      return <PokemonDetailsTableRow key={type.type.name} name={type.type.name} value={type.slot} />
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <caption>Stats</caption>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Base Stats</th>
+                      <th>Effort</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    { this.props.data.stats.map(function(stat) {
+                      return <PokemonDetailsTableRow key={stat.stat.name} name={stat.stat.name} value={stat.base_stat} extra={stat.effort || '0'} />
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <caption>Abilities</caption>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Slot</th>
+                      <th>Hidden</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    { this.props.data.abilities.map(function(ability) {
+                      return <PokemonDetailsTableRow key={ability.ability.name} name={ability.ability.name} value={ability.slot} extra={ability.is_hidden ? 'Yes' : 'No'} />
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {(() => {
+
+                if(this.props.data.held_items.length) {
+
+                  return (
+                    <div className="table-responsive">
+                      <table className="table table-striped">
+                        <caption>Held Items</caption>
+                        <thead>
+                          <tr>
+                            <th></th>
+                            <th>Rarity</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          { this.props.data.held_items.map(function(item) {
+                            return <PokemonDetailsTableRow key={item.item.name} name={item.item.name} value={item.version_details[0].rarity}  />
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
+                }
+              })()}
+
+              <div className="table-responsive">
+                <table className="table table-striped">
+                  <caption>Moves</caption>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Level Learned</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    { this.props.data.moves.map(function(move) {
+                      return <PokemonDetailsTableRow key={move.move.name} name={move.move.name} value={move.version_group_details[0].level_learned_at} />
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          )
+        }
+
+      });
+
+      var About = React.createClass({
+
+        render: function() {
+          return (
+            <div>
+              <p>Created by <a href="http://markanthonyuy.com">Mark Anthont Uy</a></p>
+            </div>
+          )
+        }
+      });
+
+      ReactDOM.render((
+        <PokemonLists />
+        ), document.getElementById('app')
+      );
+    </script>
+  </body>
+</html>
