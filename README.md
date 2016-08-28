@@ -2,6 +2,15 @@
 
 A pokedex simulator that provides data of all pokemons. Data is driven from https://pokeapi.co/
 
+
+##Libraries Used:
+
+[react-router](https://github.com/reactjs/react-router) - for routing
+[react-redux](https://github.com/reactjs/react-redux)
+[redux-thunk](https://github.com/gaearon/redux-thunk) -middleware for redux(ajax calls)
+[redux-actions](https://github.com/acdlite/redux-actions)
+[immutable](https://facebook.github.io/immutable-js/) - for redux state
+
 ## Installation
 
 ```
