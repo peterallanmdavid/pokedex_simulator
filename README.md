@@ -15,6 +15,8 @@ A pokedex simulator that provides data of all pokemons. Data is driven from http
 
 [immutable](https://facebook.github.io/immutable-js/) - for redux state
 
+we somehow pattered are redux to this https://github.com/erikras/ducks-modular-redux 
+
 ## Installation
 
 ```
