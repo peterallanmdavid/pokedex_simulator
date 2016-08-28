@@ -4,5 +4,9 @@ A pokedex simulator that provides data of all pokemons. Data is driven from http
 
 ## Installation
 
+```
+clone
+go to pokdex_simulator directory
 npm install
 npm start
+```
