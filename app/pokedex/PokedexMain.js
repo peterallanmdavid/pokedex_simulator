@@ -1,6 +1,9 @@
 import React from 'react'
 import PokemonList from './PokemonList'
-import {getPokemonList} from './pokedexDuck'
+import {
+  getPokemonList,
+  getPokemonDetails,
+} from './pokedexDuck'
 import {connect} from 'react-redux'
 import {createSelector} from 'reselect'
 
@@ -21,8 +24,14 @@ class PokedexMain extends React.Component{
               <a href="#">About</a>
             </p>
           </div>
+
           <div className="col-md-9">
-            {this.props.children}
+            <div className="page-header">
+              <h1>Details of {this.props.currentPokemon.get('name')}</h1>
+            </div>
+            {React.cloneElement(this.props.children, {
+              currentPokemon: this.props.currentPokemon
+            })}
           </div>
         </div>
     )
@@ -33,6 +42,7 @@ const dispatchSelector = createSelector(
   (dispatch) => dispatch,
   (dispatch) => ({
       getPokemonList: () => dispatch(getPokemonList()),
+      getPokemonDetails: (name) =>  dispatch(getPokemonDetails(name))
   })
 )
 

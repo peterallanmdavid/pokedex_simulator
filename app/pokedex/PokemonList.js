@@ -3,11 +3,13 @@ import immutable from 'immutable'
 import React from 'react'
 import PokemonItem from './PokemonListItem'
 
-const PokeList = ({pokeList}) => {
+const PokeList = ({
+  pokeList,
+  onShowPokemonDetails,
+}) => {
   const pokemons = pokeList.map((pokemon) => (
     <PokemonItem
         key={pokemon.get('name')}
-        onShowDetails={()=> console.log('on Show Pokemon Details')}
         name={pokemon.get('name')} />
   ))
 
