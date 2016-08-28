@@ -22,7 +22,8 @@ class PokemonDetails extends React.Component{
             sprites={currentPokemon.sprites}
             isFemale/> : null
         }
-        {//the rest of the pokemong details here}
+        {//the rest of the pokemong details here
+        }
       </div>
     )
   }

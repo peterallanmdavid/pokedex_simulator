@@ -4,7 +4,7 @@
   "description": "Pokedex",
   "main": "server.js",
   "scripts": {
-    "start": "webpack-dev-server --hot --inline",
+    "start": "webpack-dev-server --hot --inline --history-api-fallback",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mark Anthony Uy",
